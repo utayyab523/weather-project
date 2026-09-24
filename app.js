@@ -2,16 +2,16 @@ const form = document.querySelector('form');
 const searchInput = document.querySelector('.search-weather');
 const data = document.querySelector('.data');
 
-// Weather Fetch Function
 async function weatherAPIFunction(searchQuery) {
     try {
-        let response = await fetch(`/api/weather?q=${searchQuery}`);
+        let response = await fetch(`https://api.weatherapi.com/v1/current.json?key=8dd9540c311845178a570359262409&q=${searchQuery}`);
         
         if (!response.ok) {
             throw new Error('City or location not found');
         }
 
         let result = await response.json();
+        console.log(result);
 
         const weatherHTML = `
             <div class="weather-data">
@@ -43,7 +43,6 @@ async function weatherAPIFunction(searchQuery) {
     }
 }
 
-// User Location Detect
 function getUserLocation() {
     if (navigator.geolocation) {
         data.innerHTML = "<p>Detecting your location...</p>";
@@ -52,9 +51,13 @@ function getUserLocation() {
             (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                weatherAPIFunction(`${lat},${lon}`);
+                
+                const locationQuery = `${lat},${lon}`;
+                
+                weatherAPIFunction(locationQuery);
             },
             (error) => {
+                console.log("Location access denied or error:", error.message);
                 data.innerHTML = "<p>Location permission denied. Please search for a city above.</p>";
             }
         );
@@ -63,7 +66,6 @@ function getUserLocation() {
     }
 }
 
-// Form Submit Event
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     let searchQuery = searchInput.value.trim();
@@ -77,7 +79,6 @@ form.addEventListener('submit', (e) => {
     }
 });
 
-// Auto Load on Page Load
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {    
     getUserLocation();
 });
